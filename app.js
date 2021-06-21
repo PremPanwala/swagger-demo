@@ -4,6 +4,7 @@ const mongoose = require("mongoose")
 const EMP = require("./User")
 const cors = require("cors");
 require("dotenv").config();
+var jwt = require('jsonwebtoken');
 const app=express();
 const port = process.env.PORT || 5000;
 
@@ -16,7 +17,12 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.get("/",(req,res)=>{
-    try{
+    var token = req.headers['x-access-token'];
+    if (!token) return res.status(401).send({ auth: false, message: 'No token provided.' });
+    
+    jwt.verify(token, "prem", async function(err, decoded) {
+      if (err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
+      try{
 
         res.status(200).send({"name":"prem"})
     }
@@ -24,6 +30,8 @@ app.get("/",(req,res)=>{
     {
         res.status(500).send("Internal error",e)
     }
+    })
+    
 })
 
 app.post("/add",(req,res)=>{
@@ -37,9 +45,13 @@ app.post("/add",(req,res)=>{
           });
           user
             .save().then((result) => {
-                res.status(201).json({
-                  message: "User registered successfully!",
+                var token = jwt.sign({ id: result._id }, "prem", {
+                  expiresIn: 86400 // expires in 24 hours
                 });
+                res.status(201).json({
+                    message: "User registered successfully!",
+                    token
+                  });
               })
               .catch((err) => {
                 console.log(err),
