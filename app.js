@@ -28,6 +28,7 @@ app.get("/",(req,res)=>{
 
 app.post("/add",(req,res)=>{
     console.log("Inside Add route")
+    console.log(req.body.username,req.body.age)
     try{
         const user = new User({
             _id: new mongoose.Types.ObjectId(),
