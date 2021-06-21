@@ -1,7 +1,7 @@
 const express=require('express')
 const bodyParser = require("body-parser")
 const mongoose = require("mongoose")
-const User = require("./User")
+const EMP = require("./User")
 const cors = require("cors");
 require("dotenv").config();
 const app=express();
@@ -30,7 +30,7 @@ app.post("/add",(req,res)=>{
     console.log("Inside Add route")
     console.log(req.body.username,req.body.age)
     try{
-        const user = new User({
+        const user = new EMP({
             _id: new mongoose.Types.ObjectId(),
             username: req.body.username,
             age: req.body.age
